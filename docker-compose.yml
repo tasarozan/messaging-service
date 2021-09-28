@@ -8,11 +8,11 @@ services:
     environment:
       - MONGODB_CONNECTION_STRING=mongodb://mongo/messaging-service
     ports:
-      - 3000:3000
+      - 7000:7000
       - 35729:35729
     volumes:
       - ./src:/app/src
   mongo:
     image: mongo
     ports:
-      - 27017:27017
+      - 57017:27017
