@@ -10,10 +10,12 @@ const passport = require('passport')
 const User = require('./models/user')
 
 const mongooseConnection = require('./database-connection')
+const socketService = require('./socket-service')
 
 const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
 const accountRouter = require('./routes/account')
+const messagesRouter = require('./routes/messages')
 
 const app = express()
 
@@ -25,6 +27,8 @@ if (app.get('env') == 'development') {
     .createServer({ extraExts: ['pug'] })
     .watch([`${__dirname}/public`, `${__dirname}/views`])
 }
+
+app.set('io', socketService)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
@@ -61,6 +65,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/', indexRouter)
 app.use('/account', accountRouter)
 app.use('/users', usersRouter)
+app.use('/messages', messagesRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
