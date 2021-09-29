@@ -2,22 +2,33 @@ const express = require('express')
 
 const router = express.Router()
 
-const User = require('../models/user')
-
-/* GET home page. */
-router.get('/', function (req, res) {
-  res.render('index', { title: 'Express' })
-})
+const Message = require('../models/message')
 
 router.post('/', async (req, res) => {
-  const { user } = req
-  if (!user) return res.sendStatus(401)
+  try {
+    const { user } = req
+    if (!user) return res.sendStatus(401)
 
-  const { text, receiver } = req.body
+    const { text, receiverId, conversationId } = req.body
 
-  const message = await user.sendMessage({ text, receiver, sender: user })
+    const message = await new Message({ text, receiver: receiverId, conversationId, sender: user._id })
 
-  res.send(message)
+    res.send(message)
+  } catch (e) {
+    res.sendStatus(500)
+  }
+})
+
+router.get('/:conversationId', async (req, res) => {
+  try {
+    const { conversationId } = req.params
+    const messages = await Message.find({
+      conversationId,
+    })
+    res.send(messages)
+  } catch (err) {
+    res.status(404)
+  }
 })
 
 module.exports = router

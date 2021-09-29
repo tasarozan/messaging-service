@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const autopopulate = require('mongoose-autopopulate')
 const passportLocalMongoose = require('passport-local-mongoose')
 
-const Message = require('./message')
+// const Message = require('./message')
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -11,7 +11,9 @@ const userSchema = new mongoose.Schema({
   },
   blockedUsers: [
     {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      autopopulate: true,
     },
   ],
   messages: [
@@ -23,19 +25,6 @@ const userSchema = new mongoose.Schema({
   ],
 })
 
-class User {
-  async sendMessage(information) {
-    const { text, receiver } = information
-    const message = await Message.create({ text, receiver, sender: this })
-
-    this.messages.push(message)
-
-    await this.save()
-    return message
-  }
-}
-
-userSchema.loadClass(User)
 userSchema.plugin(autopopulate)
 userSchema.plugin(passportLocalMongoose, {
   usernameField: 'username',

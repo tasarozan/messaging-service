@@ -3,23 +3,18 @@ const autopopulate = require('mongoose-autopopulate')
 
 const messageSchema = new mongoose.Schema(
   {
+    conversationId: {
+      type: String,
+    },
     text: {
       type: String,
       required: true,
     },
     receiver: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      autopopulate: {
-        maxDepth: 1,
-      },
+      type: String,
     },
     sender: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      autopopulate: {
-        maxDepth: 1,
-      },
+      type: String,
     },
   },
   { timestamps: true }

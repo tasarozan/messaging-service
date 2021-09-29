@@ -16,6 +16,7 @@ const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
 const accountRouter = require('./routes/account')
 const messagesRouter = require('./routes/messages')
+const conversationsRouter = require('./routes/conversations')
 
 const app = express()
 
@@ -62,10 +63,11 @@ passport.deserializeUser(User.deserializeUser())
 
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/', indexRouter)
-app.use('/account', accountRouter)
-app.use('/users', usersRouter)
-app.use('/messages', messagesRouter)
+app.use('/api', indexRouter)
+app.use('/api/account', accountRouter)
+app.use('/api/users', usersRouter)
+app.use('/api/messages', messagesRouter)
+app.use('/api/conversations', conversationsRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

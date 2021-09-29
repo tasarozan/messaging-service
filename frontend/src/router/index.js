@@ -1,21 +1,56 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/home.vue'
+import Search from '../views/search.vue'
+import Login from '../views/login.vue'
+import Register from '../views/register.vue'
+import Profile from '../views/profile.vue'
+import Messenger from '../views/messenger.vue'
 
 Vue.use(VueRouter)
 
-const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home,
-  },
-]
-
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes,
-})
-
-export default router
+export default function init(store) {
+  return new VueRouter({
+    mode: 'history',
+    base: process.env.BASE_URL,
+    routes: [
+      {
+        path: '/',
+        name: 'Search',
+        component: Search,
+      },
+      {
+        path: '/register',
+        name: 'register',
+        component: Register,
+        beforeEnter(to, from, next) {
+          if (store.state.user) return next('/')
+          return next()
+        },
+      },
+      {
+        path: '/login',
+        name: 'login',
+        component: Login,
+        beforeEnter(to, from, next) {
+          if (store.state.user) return next('/')
+          return next()
+        },
+      },
+      {
+        path: '/profile',
+        name: 'Profile',
+        component: Profile,
+      },
+      {
+        path: '/users/:username',
+        name: 'UserDetail',
+        component: () => import('../views/user-detail.vue'),
+      },
+      {
+        path: '/messenger',
+        name: 'Messenger',
+        component: Messenger,
+      },
+    ],
+  })
+}
