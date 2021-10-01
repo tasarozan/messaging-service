@@ -2,20 +2,28 @@
 
 ## Project setup
 
-**Build**
-
 ```
-$ docker-compose up --build
+npm install
 ```
 
-**Run**
+### Compiles and hot-reloads for development
 
 ```
-$ docker-compose run
+npm run serve
 ```
 
-**Add this to your `/etc/hosts` file:**
+### Compiles and minifies for production
 
 ```
-127.0.0.1 messaging-service.localhost
+npm run build
 ```
+
+### Lints and fixes files
+
+```
+npm run lint
+```
+
+### Customize configuration
+
+See [Configuration Reference](https://cli.vuejs.org/config/).
