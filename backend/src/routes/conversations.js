@@ -4,15 +4,23 @@ const router = express.Router()
 
 const Conversation = require('../models/conversation')
 
-router.post('/', async (req, res) => {
+router.post('/:personId', async (req, res) => {
   try {
-    const { senderId, receiverId } = req.body
-    const savedConversations = await Conversation.find({ members: { $all: [senderId, receiverId] } })
-    if (savedConversations) return res.send(savedConversations)
+    const { user } = req
+    const { personId } = req.params
+    const senderId = user._id.toString()
 
-    const conversation = new Conversation({
-      members: [senderId, receiverId],
+    const savedConversation = await Conversation.findOne({
+      members: { $all: [senderId, personId] },
     })
+    if (savedConversation) {
+      return res.send(savedConversation)
+    }
+
+    const conversation = await new Conversation({
+      members: [senderId, personId],
+    })
+    await conversation.save()
 
     res.send(conversation)
   } catch (e) {
@@ -28,6 +36,18 @@ router.get('/:userId', async (req, res) => {
     })
     res.send(conversation)
   } catch (e) {
+    res.sendStatus(404)
+  }
+})
+
+router.get('/receiver/:conversationId', async (req, res) => {
+  try {
+    const { conversationId } = req.params
+
+    const conversation = await Conversation.findById(conversationId)
+
+    res.send(conversation)
+  } catch (error) {
     res.sendStatus(404)
   }
 })

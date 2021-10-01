@@ -10,11 +10,8 @@ export default {
       backendError: null,
     }
   },
-  async created() {
-    this.conversations = await this.fetchConversations(this.user._id)
-  },
   methods: {
-    ...mapActions(['fetchSession', 'fetchConversations']),
+    ...mapActions(['fetchSession']),
   },
   computed: {
     ...mapState(['user']),

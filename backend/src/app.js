@@ -12,7 +12,6 @@ const User = require('./models/user')
 const mongooseConnection = require('./database-connection')
 const socketService = require('./socket-service')
 
-const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
 const accountRouter = require('./routes/account')
 const messagesRouter = require('./routes/messages')
@@ -63,7 +62,6 @@ passport.deserializeUser(User.deserializeUser())
 
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/api', indexRouter)
 app.use('/api/account', accountRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/messages', messagesRouter)

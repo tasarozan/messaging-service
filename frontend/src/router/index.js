@@ -42,11 +42,6 @@ export default function init(store) {
         component: Profile,
       },
       {
-        path: '/users/:username',
-        name: 'UserDetail',
-        component: () => import('../views/user-detail.vue'),
-      },
-      {
         path: '/messenger',
         name: 'Messenger',
         component: Messenger,

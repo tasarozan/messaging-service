@@ -13,8 +13,11 @@ router.post('/', async (req, res) => {
 
     const message = await new Message({ text, receiver: receiverId, conversationId, sender: user._id })
 
+    await message.save()
+
     res.send(message)
   } catch (e) {
+    console.log(e)
     res.sendStatus(500)
   }
 })

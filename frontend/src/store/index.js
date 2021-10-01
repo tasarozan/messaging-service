@@ -9,15 +9,15 @@ const socket = io()
 
 const mutations = {
   SET_USER: 'set user',
-  SET_CURRENT_CONVERSATION: 'set current conversation',
+  START_CONVERSATION: 'start conversation',
   ADD_CONVERSATION: 'add conversation',
-  SEND_CONVERSATION_MESSAGES: 'send conversation messages',
+  SEND_MESSAGE_TO_CONVERSATION: 'send message to conversation',
 }
 
 const store = new Vuex.Store({
   state: {
     user: null,
-    currentConversation: null,
+    currentLiveConversation: null,
     conversations: [],
     conversationMessages: [],
   },
@@ -25,14 +25,14 @@ const store = new Vuex.Store({
     [mutations.SET_USER](state, user) {
       state.user = user
     },
-    [mutations.SET_CURRENT_CONVERSATION](state, live) {
-      state.currentConversation = live
+    [mutations.START_CONVERSATION](state, conversationId) {
+      state.currentLiveConversation = conversationId
     },
-    [mutations.ADD_CONVERSATION](state, convs) {
-      state.conversations.push(convs)
+    [mutations.ADD_CONVERSATION](state, conversationId) {
+      state.conversations.push(conversationId)
     },
-    [mutations.SEND_CONVERSATION_MESSAGES](state, convMessages) {
-      state.conversationMessages.push(convMessages)
+    [mutations.SEND_MESSAGE_TO_CONVERSATION](state, message) {
+      state.conversationMessages.push(message)
     },
   },
   actions: {
@@ -53,45 +53,59 @@ const store = new Vuex.Store({
     },
     async fetchUser(store, credentials) {
       const userRequest = await axios.get(`/api/users/search/${credentials}`)
-      console.log(userRequest)
       return userRequest.data[0]
     },
-    // async fetchConversations(store, credentials) {
-    //   console.log(credentials)
-    //   const conversationRequest = await axios.get(`/api/conversations`)
-    //   return conversationRequest.data
-    // },
     async block(store, personId) {
       await axios.put(`/api/users/block/${personId}`)
     },
     async unblock(store, personId) {
       await axios.put(`/api/users/unblock/${personId}`)
     },
-    async addConversation({ commit }, convs) {
-      commit(mutations.ADD_CONVERSATION, convs)
+    async fetchConversationReceiver(store, credentials) {
+      const { conversationId, userId } = credentials
+
+      const conversation = await axios.get(`/api/conversations/receiver/${conversationId}`)
+
+      const receiver = conversation.data.members.filter(personId => personId != userId)[0]
+      return receiver
     },
-    async sendConversationMessages({ state, commit }, text) {
-      const message = {
-        text,
-        sender: state.user.username,
-      }
-      commit(mutations.SEND_CONVERSATION_MESSAGES, message)
-      socket.emit('new message', state.currentConversation, message)
+    async fetchConversation(store, credentials) {
+      const { conversationId } = credentials
+
+      const conversation = await axios.get(`/api/conversations/conversation/${conversationId}`)
+      return conversation.data
+    },
+    async startConversation({ commit }, personId) {
+      const conversation = await axios.post(`/api/conversations/${personId}`)
+
+      socket.emit('start conversation', conversation.data._id, () => {
+        commit(mutations.START_CONVERSATION, conversation.data._id)
+      })
+    },
+    async addConversation({ commit }, conversationId) {
+      commit(mutations.ADD_CONVERSATION, conversationId)
+    },
+    async sendMessageToConversation({ commit }, body) {
+      console.log(body)
+      const message = await axios.post('/api/messages', body)
+
+      commit(mutations.SEND_MESSAGE_TO_CONVERSATION, message.data)
+      socket.emit('new message', message.data.conversationId, message.data)
     },
     async joinConversation({ commit }, conversationId) {
       socket.emit('join conversation', conversationId)
-      commit(mutations.SET_CURRENT_CONVERSATION, conversationId)
+      commit(mutations.START_CONVERSATION, conversationId)
     },
   },
   modules: {},
 })
 
-socket.on('new conversation', user => {
-  store.dispatch('addConversation', user)
+socket.on('new conversation', conversationId => {
+  store.dispatch('addConversation', conversationId)
 })
 
-socket.on('new live stream message', message => {
-  store.commit(mutations.SEND_CONVERSATION_MESSAGES, message)
+socket.on('new live conversation message', message => {
+  store.commit(mutations.SEND_MESSAGE_TO_CONVERSATION, message)
 })
 
 export default async function init() {

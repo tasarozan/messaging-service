@@ -3,12 +3,20 @@ const io = require('socket.io')({
 })
 
 io.on('connect', socket => {
-  socket.on('new message', message => {
-    socket.emit('new live stream message', message)
+  socket.emit('connected')
 
-    socket.on('join conversation', conversationId => {
-      socket.join(conversationId)
-    })
+  socket.on('new message', (userId, message) => {
+    socket.broadcast.to(userId).emit('new live conversation message', message)
+  })
+
+  socket.on('join conversation', conversationId => {
+    socket.join(conversationId)
+  })
+
+  socket.on('start conversation', (conversationId, cb) => {
+    socket.broadcast.emit('new conversation', conversationId)
+    socket.join(conversationId)
+    cb(true)
   })
 })
 

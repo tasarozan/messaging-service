@@ -29,28 +29,9 @@ export default {
         this.backendError = e.response.data.message
       }
     },
-    async blockUser(personId) {
-      try {
-        await this.block(personId)
-      } catch (e) {
-        this.backendError = e.response.data.message
-      }
-    },
-    async unblockUser(personId) {
-      try {
-        await this.unblock(personId)
-      } catch (e) {
-        this.backendError = e.response.data.message
-      }
-    },
-    sendMessage(e) {
-      e.preventDefault()
-      this.sendConversationMessages(this.message)
-      this.message = ''
-    },
   },
   computed: {
-    ...mapState(['user', 'conversationMessages']),
+    ...mapState(['user']),
   },
 }
 </script>

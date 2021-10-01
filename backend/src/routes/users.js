@@ -5,9 +5,14 @@ const router = express.Router()
 const User = require('../models/user')
 
 router.get('/', async (req, res) => {
-  const users = await User.find({})
+  try {
+    const users = await User.find({})
 
-  res.send(users)
+    res.send(users)
+  } catch (err) {
+    console.log(err)
+    res.sendStatus(404)
+  }
 })
 
 router.get('/search/:username', async (req, res) => {
